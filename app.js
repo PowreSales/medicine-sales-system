@@ -1,4 +1,4 @@
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbxz5xf0mijkBTdGzy_kF84DKdnjBdrdWnYshGr3tzhwnDUGkzRyfyyyk5etw9o7IWW6/exec'; // Replace with your GAS web app URL
+const GAS_URL = 'YOUR_GAS_WEB_APP_URL'; // Replace with your GAS web app URL
 let role = '';
 let sessionId = '';
 let inventoryData = [];
@@ -9,8 +9,8 @@ function showModal(title, message, isConfirm = false) {
   document.getElementById('modal-title').textContent = title;
   document.getElementById('modal-message').textContent = message;
   document.getElementById('modal-buttons').innerHTML = isConfirm
-    ? '<button onclick="confirmAction()">Confirm</button><button onclick="closeModal()">Cancel</button>'
-    : '<button id="modal-ok" onclick="closeModal()">OK</button>';
+    ? '<button id="modal-confirm">Confirm</button><button id="modal-cancel">Cancel</button>'
+    : '<button id="modal-ok">OK</button>';
   document.getElementById('modal').style.display = 'flex';
 }
 
@@ -429,11 +429,18 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelector('button[aria-label="Logout"]').addEventListener('click', logout);
 
   // Form buttons
-  document.querySelector('#sales-form-section button[onclick="addItem()"]').addEventListener('click', addItem);
-  document.querySelector('#sales-form-section button[onclick="submitSale()"]').addEventListener('click', submitSale);
-  document.querySelector('#inventory-form-section button[onclick="addMedicine()"]').addEventListener('click', addMedicine);
-  document.querySelector('#sales-report button[onclick="loadSalesReport()"]').addEventListener('click', loadSalesReport);
-  document.querySelector('#sales-summary-section button[onclick="loadSalesSummary()"]').addEventListener('click', loadSalesSummary);
+  document.getElementById('add-item-btn').addEventListener('click', addItem);
+  document.getElementById('submit-sale-btn').addEventListener('click', submitSale);
+  document.getElementById('add-medicine-btn').addEventListener('click', addMedicine);
+  document.getElementById('generate-report-btn').addEventListener('click', loadSalesReport);
+  document.getElementById('generate-summary-btn').addEventListener('click', loadSalesSummary);
+
+  // Modal buttons
+  document.getElementById('modal-ok').addEventListener('click', closeModal);
+  document.getElementById('modal-buttons').addEventListener('click', (e) => {
+    if (e.target.id === 'modal-confirm') confirmAction();
+    if (e.target.id === 'modal-cancel') closeModal();
+  });
 });
 
 if ('serviceWorker' in navigator) {
