@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+   <html lang="en">
+   <head>
+     <title>Medicine Sales System</title>
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com 'unsafe-inline'; font-src https://cdnjs.cloudflare.com;">
+     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+     <style>
+       body {
+         font-family: Arial, sans-serif;
+         margin: 20px;
+         background-color: #f0f0f0;
+       }
+       .container {
+         max-width: 1176px;
+         margin: 0 auto;
+         padding-top: 80px;
+       }
+       .nav-bar {
+         position: fixed;
+         top: 0;
+         left: 0;
+         right: 0;
+         background-color: #333;
+         padding: 10px 20px;
+         z-index: 1000;
+         max-width: 800px;
+         margin: 0 auto;
+         box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+         display: none;
+       }
+       .nav-bar.active {
+         display: flex;
+       }
+       .nav-bar button {
+         font-size: 16px;
+         padding: 8px 12px;
+         margin-right: 5px;
+         background: linear-gradient(135deg, #007BFF, #0056b3);
+         color: white;
+         border: 1px solid #0056b3;
+         border-radius: 6px;
+         cursor: pointer;
+         display: inline-flex;
+         align-items: center;
+         gap: 8px;
+         transition: background 0.3s ease;
+       }
+       .nav-bar button:hover {
+         background: linear-gradient(135deg, #0056b3, #003d80);
+       }
+       .form-section {
+         margin-bottom: 30px;
+         padding: 20px;
+         border-radius: 8px;
+         color: #FFFFFF;
+         background-color: #1B4D3E;
+       }
+       .login-form-section {
+         background-color: #FFFFFF;
+         color: #000000;
+         border: 1px solid #ccc;
+       }
+       .form-group {
+         margin-bottom: 15px;
+       }
+       label {
+         font-size: 24px;
+         margin-bottom: 5px;
+         display: block;
+       }
+       input, select {
+         font-size: 24px;
+         padding: 8px;
+         border: 1px solid #ccc;
+         border-radius: 4px;
+         width: 100%;
+         box-sizing: border-box;
+       }
+       button {
+         font-size: 20px;
+         padding: 8px 16px;
+         background-color: #007BFF;
+         color: white;
+         border: none;
+         border-radius: 4px;
+         cursor: pointer;
+       }
+       button:hover {
+         background-color: #0056b3;
+       }
+       table {
+         width: 100%;
+         border-collapse: collapse;
+         margin-top: 20px;
+         background-color: white;
+       }
+       th, td {
+         border: 1px solid #ccc;
+         padding: 10px;
+         font-size: 18px;
+       }
+       th {
+         background-color: #1B4D3E;
+         color: white;
+       }
+       tr:nth-child(even) {
+         background-color: #F8F8F8;
+       }
+       .in-stock { background-color: #FFFFFF; color: black; }
+       .low-stock { background-color: #FFC107; color: black; }
+       .out-of-stock { background-color: #DC3545; color: white; }
+       .hidden { display: none; }
+       .modal {
+         display: none;
+         position: fixed;
+         top: 0;
+         left: 0;
+         width: 100%;
+         height: 100%;
+         background-color: rgba(0,0,0,0.5);
+         justify-content: center;
+         align-items: center;
+       }
+       .modal-content {
+         background-color: white;
+         padding: 20px;
+         border-radius: 5px;
+         max-width: 400px;
+         width: 90%;
+         text-align: center;
+       }
+       .modal-content h2 {
+         font-size: 24px;
+         margin-bottom: 10px;
+       }
+       .modal-content p {
+         font-size: 20px;
+         margin-bottom: 15px;
+         font-weight: bold;
+       }
+       .modal-content button {
+         font-size: 18px;
+         padding: 8px 16px;
+       }
+       .toast {
+         position: fixed;
+         bottom: 20px;
+         right: 20px;
+         background-color: #333;
+         color: white;
+         padding: 10px 20px;
+         border-radius: 4px;
+         display: none;
+         z-index: 2000;
+       }
+       .select2-selection__rendered {
+         font-size: 24px !important;
+         padding: 8px !important;
+       }
+       .select2-selection {
+         border: 1px solid #ccc !important;
+         border-radius: 4px !important;
+         height: auto !important;
+       }
+       #loading {
+         position: fixed;
+         top: 50%;
+         left: 50%;
+         transform: translate(-50%, -50%);
+         background-color: rgba(0,0,0,0.7);
+         color: white;
+         padding: 10px 20px;
+         border-radius: 5px;
+         z-index: 2000;
+       }
+       @media (max-width: 600px) {
+         .container { padding-top: 100px; }
+         .nav-bar { flex-wrap: wrap; gap: 8px; }
+         .nav-bar button { font-size: 14px; padding: 6px 10px; flex: 1; }
+         label, input, select, .select2-selection__rendered {
+           font-size: 18px !important;
+         }
+         button { font-size: 16px; }
+         table { display: block; overflow-x: auto; }
+         th, td { font-size: 14px; padding: 6px; }
+         .modal-content { max-width: 300px; }
+       }
+     </style>
+   </head>
+   <body>
+     <div class="container">
+       <div id="login-form" class="login-form-section">
+         <h2>Login</h2>
+         <div class="form-group">
+           <label for="username">Username</label>
+           <input type="text" id="username" required aria-required="true">
+         </div>
+         <div class="form-group">
+           <label for="password">Password</label>
+           <input type="password" id="password" required aria-required="true">
+         </div>
+         <button id="login-btn">Login</button>
+       </div>
+
+       <div id="main-app" class="hidden">
+         <div class="nav-bar" id="nav-bar">
+           <button onclick="showSection('sales-form-section')" aria-label="Sales Form"><i class="fas fa-shopping-cart"></i> Sales</button>
+           <button id="inventory-btn" onclick="showSection('inventory-form-section')" aria-label="Manage Inventory"><i class="fas fa-box"></i> Inventory</button>
+           <button id="sales-report-btn" onclick="showSection('sales-report')" aria-label="Sales Report"><i class="fas fa-chart-line"></i> Report</button>
+           <button id="sales-summary-btn" onclick="showSection('sales-summary-section')" aria-label="Sales Summary"><i class="fas fa-table"></i> Summary</button>
+           <button onclick="logout()" aria-label="Logout"><i class="fas fa-sign-out-alt"></i> Logout</button>
+         </div>
+
+         <div id="sales-form-section" class="form-section hidden">
+           <h2>Sales Form</h2>
+           <div class="form-group">
+             <label for="sale-date">Date</label>
+             <input type="date" id="sale-date" required aria-required="true">
+           </div>
+           <div class="form-group">
+             <label for="medicine">Medicine</label>
+             <select id="medicine" class="medicine-select">
+               <option value="">Select medicine...</option>
+             </select>
+           </div>
+           <div class="form-group">
+             <label for="quantity">Quantity (Available: <span id="available-stock">0</span>)</label>
+             <input type="number" id="quantity" min="1" aria-describedby="available-stock">
+           </div>
+           <div class="form-group">
+             <label for="unit-price">Unit Price (GHC)</label>
+             <input type="number" id="unit-price" readonly>
+           </div>
+           <button onclick="addItem()">Add Item</button>
+           <div id="purchase-summary">No items selected.</div>
+           <div class="form-group">
+             <label for="grand-total">Grand Total (GHC)</label>
+             <input type="number" id="grand-total" readonly>
+           </div>
+           <div class="form-group">
+             <label for="payment-method">Payment Method</label>
+             <select id="payment-method">
+               <option value="cash">Cash</option>
+               <option value="Momo">Momo</option>
+             </select>
+           </div>
+           <button onclick="submitSale()">Submit Sale</button>
+         </div>
+
+         <div id="inventory-form-section" class="form-section hidden">
+           <h2>Manage Inventory</h2>
+           <div class="form-group">
+             <label for="medicine-name">Medicine Name</label>
+             <select id="medicine-name" class="medicine-name-select">
+               <option value="">Add or select medicine...</option>
+             </select>
+           </div>
+           <div class="form-group">
+             <label for="medicine-price">Unit Price (GHC)</label>
+             <input type="number" id="medicine-price" step="0.01" min="0">
+           </div>
+           <div class="form-group">
+             <label for="medicine-stock">Stock Quantity</label>
+             <input type="number" id="medicine-stock" min="0">
+           </div>
+           <button onclick="addMedicine()">Add/Update</button>
+           <table id="inventory-table" role="grid">
+             <thead>
+               <tr>
+                 <th scope="col">Name</th>
+                 <th scope="col">Price (GHC)</th>
+                 <th scope="col">Stock</th>
+                 <th scope="col">Status</th>
+               </tr>
+             </thead>
+             <tbody></tbody>
+           </table>
+         </div>
+
+         <div id="sales-report" class="form-section hidden">
+           <h2>Sales Report</h2>
+           <div class="form-group">
+             <label for="start-date">Start Date</label>
+             <input type="date" id="start-date">
+           </div>
+           <div class="form-group">
+             <label for="end-date">End Date</label>
+             <input type="date" id="end-date">
+           </div>
+           <button onclick="loadSalesReport()">Generate</button>
+           <table id="sales-table" role="grid">
+             <thead>
+               <tr>
+                 <th scope="col">Date</th>
+                 <th scope="col">Medicine</th>
+                 <th scope="col">Price (GHC)</th>
+                 <th scope="col">Quantity</th>
+                 <th scope="col">Total (GHC)</th>
+               </tr>
+             </thead>
+             <tbody></tbody>
+           </table>
+         </div>
+
+         <div id="sales-summary-section" class="form-section hidden">
+           <h2>Sales Summary</h2>
+           <div class="form-group">
+             <label for="summary-start-date">Start Date</label>
+             <input type="date" id="summary-start-date">
+           </div>
+           <div class="form-group">
+             <label for="summary-end-date">End Date</label>
+             <input type="date" id="summary-end-date">
+           </div>
+           <button onclick="loadSalesSummary()">Generate</button>
+           <table id="sales-summary-table" role="grid">
+             <thead>
+               <tr>
+                 <th scope="col">Medicine</th>
+                 <th scope="col">Total Sales (GHC)</th>
+               </tr>
+             </thead>
+             <tbody></tbody>
+           </table>
+         </div>
+       </div>
+
+       <div id="modal" class="modal" role="dialog" aria-modal="true">
+         <div class="modal-content">
+           <h2 id="modal-title"></h2>
+           <p id="modal-message"></p>
+           <div class="modal-buttons">
+             <button id="modal-ok" onclick="closeModal()">OK</button>
+           </div>
+         </div>
+       </div>
+       <div id="toast" class="toast"></div>
+     </div>
+
+     <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+     <script>
+       const GAS_URL = 'YOUR_GAS_WEB_APP_URL'; // Replace with your GAS web app URL
+       let role = '';
+       let sessionId = '';
+       let inventoryData = [];
+       let selectedItems = [];
+
+       function showModal(title, message, isConfirm = false) {
+         if (document.getElementById('modal').style.display === 'flex') return;
+         document.getElementById('modal-title').textContent = title;
+         document.getElementById('modal-message').textContent = message;
+         document.getElementById('modal-buttons').innerHTML = isConfirm
+           ? '<button onclick="confirmAction()">Confirm</button><button onclick="closeModal()">Cancel</button>'
+           : '<button id="modal-ok" onclick="closeModal()">OK</button>';
+         document.getElementById('modal').style.display = 'flex';
+       }
+
+       function closeModal() {
+         document.getElementById('modal').style.display = 'none';
+       }
+
+       function showToast(message, duration = 3000) {
+         const toast = document.getElementById('toast');
+         toast.textContent = message;
+         toast.style.display = 'block';
+         setTimeout(() => toast.style.display = 'none', duration);
+       }
+
+       function showLoading(show) {
+         const loading = document.getElementById('loading');
+         if (show && !loading) {
+           const div = document.createElement('div');
+           div.id = 'loading';
+           div.textContent = 'Loading...';
+           document.body.appendChild(div);
+           setTimeout(() => showLoading(false), 10000);
+         } else if (!show && loading) {
+           loading.remove();
+         }
+       }
+
+       async function callGasFunction(functionName, data) {
+         try {
+           const response = await fetch(GAS_URL, {
+             method: 'POST',
+             headers: { 'Content-Type': 'application/json' },
+             body: JSON.stringify({ functionName, data }),
+             mode: 'cors',
+             credentials: 'include'
+           });
+           const result = await response.json();
+           if (result.error) throw new Error(result.error);
+           return result.data;
+         } catch (error) {
+           throw new Error(`Failed to call ${functionName}: ${error.message}`);
+         }
+       }
+
+       function initializeSelect2() {
+         $('.medicine-select').select2({
+           placeholder: 'Select medicine...',
+           allowClear: true,
+           width: '100%'
+         });
+         $('.medicine-name-select').select2({
+           placeholder: 'Add or select medicine...',
+           allowClear: true,
+           width: '100%',
+           tags: true
+         });
+         $('#medicine').on('change', updateUnitPrice);
+       }
+
+       async function login() {
+         const username = document.getElementById('username').value.trim();
+         const password = document.getElementById('password').value;
+         if (!username || !password) {
+           showToast('Please enter username and password');
+           return;
+         }
+         showLoading(true);
+         try {
+           const result = await callGasFunction('validateUser', { username, password });
+           showLoading(false);
+           if (result.success) {
+             role = result.role;
+             sessionId = result.sessionId;
+             document.getElementById('login-form').classList.add('hidden');
+             document.getElementById('main-app').classList.remove('hidden');
+             const navBar = document.getElementById('nav-bar');
+             navBar.classList.add('active');
+             if (result.role === 'Manager') {
+               document.getElementById('inventory-btn').classList.remove('hidden');
+               document.getElementById('sales-report-btn').classList.remove('hidden');
+               document.getElementById('sales-summary-btn').classList.remove('hidden');
+             }
+             showSection('sales-form-section');
+           } else {
+             showModal('Error', result.message || 'Login failed');
+           }
+         } catch (error) {
+           showLoading(false);
+           showModal('Error', error.message);
+         }
+       }
+
+       function showSection(sectionId) {
+         document.querySelectorAll('.form-section').forEach(section => section.classList.add('hidden'));
+         document.getElementById(sectionId).classList.remove('hidden');
+         if (sectionId === 'sales-form-section' || sectionId === 'inventory-form-section') {
+           loadInventory();
+         }
+       }
+
+       function logout() {
+         role = '';
+         sessionId = '';
+         inventoryData = [];
+         selectedItems = [];
+         document.getElementById('main-app').classList.add('hidden');
+         document.getElementById('nav-bar').classList.remove('active');
+         document.getElementById('login-form').classList.remove('hidden');
+         document.getElementById('username').value = '';
+         document.getElementById('password').value = '';
+         showToast('Logged out successfully');
+       }
+
+       async function loadInventory() {
+         if (!sessionId) {
+           showModal('Error', 'Session expired. Please log in.');
+           logout();
+           return;
+         }
+         showLoading(true);
+         try {
+           const result = await callGasFunction('getInventoryData', { sessionId });
+           showLoading(false);
+           if (result.success) {
+             inventoryData = result.data;
+             updateInventoryTable();
+             updateMedicineDropdowns();
+           } else {
+             showModal('Error', result.message || 'Failed to load inventory');
+             if (result.message === 'Invalid session') logout();
+           }
+         } catch (error) {
+           showLoading(false);
+           showModal('Error', error.message);
+         }
+       }
+
+       function updateInventoryTable() {
+         const tbody = document.getElementById('inventory-table').getElementsByTagName('tbody')[0];
+         tbody.innerHTML = '';
+         inventoryData.forEach(item => {
+           const row = document.createElement('tr');
+           row.setAttribute('aria-label', `Medicine: ${item.name}`);
+           const status = item.stock === 0 ? 'Out of Stock' : item.stock < item.reorderLevel ? 'Low Stock' : 'In Stock';
+           row.className = status.toLowerCase().replace(' ', '-');
+           row.innerHTML = `
+             <td>${item.name}</td>
+             <td>${item.unitPrice.toFixed(2)}</td>
+             <td>${item.stock}</td>
+             <td>${status}</td>
+           `;
+           tbody.appendChild(row);
+         });
+       }
+
+       function updateMedicineDropdowns() {
+         const medicineSelect = document.getElementById('medicine');
+         const medicineNameSelect = document.getElementById('medicine-name');
+         medicineSelect.innerHTML = '<option value="">Select medicine...</option>';
+         medicineNameSelect.innerHTML = '<option value="">Add or select medicine...</option>';
+         inventoryData.forEach(item => {
+           if (item.stock > 0) {
+             const option = document.createElement('option');
+             option.value = item.name;
+             option.textContent = `${item.name} (Stock: ${item.stock})`;
+             option.dataset.price = item.unitPrice;
+             option.dataset.stock = item.stock;
+             medicineSelect.appendChild(option);
+           }
+           const nameOption = document.createElement('option');
+           nameOption.value = item.name;
+           nameOption.textContent = item.name;
+           nameOption.dataset.price = item.unitPrice;
+           nameOption.dataset.stock = item.stock;
+           medicineNameSelect.appendChild(nameOption);
+         });
+         $('#medicine').trigger('change');
+       }
+
+       function updateUnitPrice() {
+         const selectedOption = document.getElementById('medicine').selectedOptions[0];
+         const unitPrice = selectedOption ? parseFloat(selectedOption.dataset.price) || 0 : 0;
+         const stock = selectedOption ? parseInt(selectedOption.dataset.stock) || 0 : 0;
+         document.getElementById('unit-price').value = unitPrice.toFixed(2);
+         document.getElementById('available-stock').textContent = stock;
+         const quantityInput = document.getElementById('quantity');
+         quantityInput.max = stock;
+         quantityInput.value = stock > 0 ? 1 : '';
+         updateGrandTotal();
+       }
+
+       function addItem() {
+         const medicine = document.getElementById('medicine').value;
+         const quantity = parseInt(document.getElementById('quantity').value) || 0;
+         const unitPrice = parseFloat(document.getElementById('unit-price').value) || 0;
+         if (!medicine || quantity <= 0) {
+           showToast('Select a medicine and valid quantity');
+           return;
+         }
+         const selectedOption = document.getElementById('medicine').selectedOptions[0];
+         const availableStock = parseInt(selectedOption.dataset.stock) || 0;
+         if (quantity > availableStock) {
+           showToast(`Only ${availableStock} units available`);
+           return;
+         }
+         selectedItems.push({ medicine, quantity, unitPrice, total: unitPrice * quantity });
+         updateSummary();
+         updateGrandTotal();
+         document.getElementById('medicine').value = '';
+         document.getElementById('quantity').value = '';
+         document.getElementById('unit-price').value = '';
+         $('#medicine').val(null).trigger('change');
+         showToast('Item added');
+       }
+
+       function updateSummary() {
+         const summary = document.getElementById('purchase-summary');
+         if (selectedItems.length === 0) {
+           summary.innerHTML = 'No items selected.';
+           return;
+         }
+         let html = '<table role="grid"><thead><tr><th scope="col">Medicine</th><th scope="col">Quantity</th><th scope="col">Price (GHC)</th><th scope="col">Total</th></tr></thead><tbody>';
+         selectedItems.forEach(item => {
+           html += `<tr><td>${item.medicine}</td><td>${item.quantity}</td><td>${item.unitPrice.toFixed(2)}</td><td>${item.total.toFixed(2)}</td></tr>`;
+         });
+         html += '</tbody></table>';
+         summary.innerHTML = html;
+       }
+
+       function updateGrandTotal() {
+         const grandTotal = selectedItems.reduce((sum, item) => sum + item.total, 0);
+         document.getElementById('grand-total').value = grandTotal.toFixed(2);
+       }
+
+       async function submitSale() {
+         if (!sessionId) {
+           showModal('Error', 'Session expired. Please log in.');
+           logout();
+           return;
+         }
+         const saleDate = document.getElementById('sale-date').value;
+         const paymentMethod = document.getElementById('payment-method').value;
+         if (!saleDate || selectedItems.length === 0 || !paymentMethod) {
+           showToast('Complete all fields and add items');
+           return;
+         }
+         showLoading(true);
+         try {
+           const result = await callGasFunction('submitSale', {
+             sessionId,
+             data: { date: saleDate, items: selectedItems, paymentMethod }
+           });
+           showLoading(false);
+           if (result.success) {
+             showModal('Success', 'Sale recorded');
+             selectedItems = [];
+             document.getElementById('sale-date').value = new Date().toISOString().split('T')[0];
+             document.getElementById('medicine').value = '';
+             document.getElementById('quantity').value = '';
+             document.getElementById('unit-price').value = '';
+             $('#medicine').val(null).trigger('change');
+             updateSummary();
+             loadInventory();
+           } else {
+             showModal('Error', result.message || 'Failed to record sale');
+             if (result.message === 'Invalid session') logout();
+           }
+         } catch (error) {
+           showLoading(false);
+           showModal('Error', error.message);
+         }
+       }
+
+       async function addMedicine() {
+         if (!sessionId) {
+           showModal('Error', 'Session expired. Please log in.');
+           logout();
+           return;
+         }
+         const name = document.getElementById('medicine-name').value.trim();
+         const unitPrice = parseFloat(document.getElementById('medicine-price').value) || 0;
+         const stock = parseInt(document.getElementById('medicine-stock').value) || 0;
+         if (!name || unitPrice <= 0 || stock < 0) {
+           showToast('Enter valid medicine name, price, and stock');
+           return;
+         }
+         showLoading(true);
+         try {
+           const result = await callGasFunction('addMedicine', {
+             sessionId,
+             data: { name, unitPrice, stock }
+           });
+           showLoading(false);
+           if (result.success) {
+             showModal('Success', 'Medicine added/updated');
+             document.getElementById('medicine-name').value = '';
+             document.getElementById('medicine-price').value = '';
+             document.getElementById('medicine-stock').value = '';
+             $('#medicine-name').val(null).trigger('change');
+             loadInventory();
+           } else {
+             showModal('Error', result.message || 'Failed to add medicine');
+             if (result.message === 'Invalid session') logout();
+           }
+         } catch (error) {
+           showLoading(false);
+           showModal('Error', error.message);
+         }
+       }
+
+       async function loadSalesReport() {
+         if (!sessionId) {
+           showModal('Error', 'Session expired. Please log in.');
+           logout();
+           return;
+         }
+         const startDate = document.getElementById('start-date').value;
+         const endDate = document.getElementById('end-date').value;
+         if (!startDate || !endDate) {
+           showToast('Select both dates');
+           return;
+         }
+         showLoading(true);
+         try {
+           const result = await callGasFunction('getSalesReport', {
+             sessionId,
+             data: { startDate, endDate }
+           });
+           showLoading(false);
+           if (result.success) {
+             const tbody = document.getElementById('sales-table').getElementsByTagName('tbody')[0];
+             tbody.innerHTML = '';
+             result.data.forEach(sale => {
+               const row = document.createElement('tr');
+               row.innerHTML = `
+                 <td>${sale.date}</td>
+                 <td>${sale.medicine}</td>
+                 <td>${sale.unitPrice.toFixed(2)}</td>
+                 <td>${sale.quantity}</td>
+                 <td>${(sale.unitPrice * sale.quantity).toFixed(2)}</td>
+               `;
+               tbody.appendChild(row);
+             });
+           } else {
+             showModal('Error', result.message || 'Failed to load report');
+             if (result.message === 'Invalid session') logout();
+           }
+         } catch (error) {
+           showLoading(false);
+           showModal('Error', error.message);
+         }
+       }
+
+       async function loadSalesSummary() {
+         if (!sessionId) {
+           showModal('Error', 'Session expired. Please log in.');
+           logout();
+           return;
+         }
+         const startDate = document.getElementById('summary-start-date').value;
+         const endDate = document.getElementById('summary-end-date').value;
+         if (!startDate || !endDate) {
+           showToast('Select both dates');
+           return;
+         }
+         showLoading(true);
+         try {
+           const result = await callGasFunction('getSalesSummary', {
+             sessionId,
+             data: { startDate, endDate }
+           });
+           showLoading(false);
+           if (result.success) {
+             const tbody = document.getElementById('sales-summary-table').getElementsByTagName('tbody')[0];
+             tbody.innerHTML = '';
+             result.data.forEach(item => {
+               const row = document.createElement('tr');
+               row.innerHTML = `
+                 <td>${item.medicine}</td>
+                 <td>${item.totalSales.toFixed(2)}</td>
+               `;
+               tbody.appendChild(row);
+             });
+           } else {
+             showModal('Error', result.message || 'Failed to load summary');
+             if (result.message === 'Invalid session') logout();
+           }
+         } catch (error) {
+           showLoading(false);
+           showModal('Error', error.message);
+         }
+       }
+
+       $(document).ready(() => {
+         initializeSelect2();
+         document.getElementById('login-btn').addEventListener('click', login);
+         document.getElementById('sale-date').value = new Date().toISOString().split('T')[0];
+         document.getElementById('sale-date').max = new Date().toISOString().split('T')[0];
+       });
+
+       if ('serviceWorker' in navigator) {
+         navigator.serviceWorker.register('/service-worker.js')
+           .then(() => console.log('Service Worker Registered'))
+           .catch(err => console.error('Service Worker Error:', err));
+       }
+     </script>
+   </body>
+   </html>
