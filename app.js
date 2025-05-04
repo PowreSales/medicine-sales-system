@@ -1,4 +1,4 @@
-const GAS_URL = 'YOUR_GAS_WEB_APP_URL'; // Replace with your GAS web app URL
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbxz5xf0mijkBTdGzy_kF84DKdnjBdrdWnYshGr3tzhwnDUGkzRyfyyyk5etw9o7IWW6/exec'; // Replace with your GAS web app URL
 let role = '';
 let sessionId = '';
 let inventoryData = [];
