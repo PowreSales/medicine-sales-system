@@ -6,7 +6,7 @@
     <title>Medicine Sales System - Login</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
-        const BASE_URL = 'https://script.google.com/macros/s/AKfycbwMumxYrEusSLGYqzatfdzlqlUZf5ZVSA7OhmO217-4KZDXwBtI6CvqT_SpoRv-u4fLgg/exec'; // Replace with your Google Apps Script web app URL
+        const BASE_URL = 'YOUR_GOOGLE_APPS_SCRIPT_URL'; // Replace with your Google Apps Script web app URL
 
         function showMessage(message, isError = false) {
             const msgDiv = document.getElementById('message');
@@ -32,6 +32,9 @@
                         payload: { username, password }
                     })
                 });
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
                 const result = await response.json();
                 if (result.success) {
                     localStorage.setItem('sessionId', result.sessionId);
@@ -44,7 +47,8 @@
                     showMessage(result.message, true);
                 }
             } catch (error) {
-                showMessage('Error: Could not connect to server', true);
+                showMessage(`Error: Could not connect to server (${error.message})`, true);
+                console.error('Login error:', error);
             }
         }
     </script>
