@@ -3,11 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Medicine Sales System</title>
+    <title>Medicine Sales System - Login</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
-        // Replace with your Google Apps Script web app URL
-        const BASE_URL = 'https://script.google.com/macros/s/AKfycbwMumxYrEusSLGYqzatfdzlqlUZf5ZVSA7OhmO217-4KZDXwBtI6CvqT_SpoRv-u4fLgg/exec';
+        const BASE_URL = 'YOUR_GOOGLE_APPS_SCRIPT_URL'; // Replace with your Google Apps Script web app URL
 
         function showMessage(message, isError = false) {
             const msgDiv = document.getElementById('message');
@@ -15,7 +14,7 @@
             msgDiv.className = isError ? 'text-red-500' : 'text-green-500';
         }
 
-        function validateLogin(event) {
+        async function validateLogin(event) {
             event.preventDefault();
             const username = document.getElementById('username').value.trim();
             const password = document.getElementById('password').value;
@@ -24,21 +23,29 @@
                 return;
             }
             showMessage('Logging in...');
-            google.script.run
-                .withSuccessHandler(result => {
-                    if (result.success) {
-                        localStorage.setItem('sessionId', result.sessionId);
-                        localStorage.setItem('role', result.role);
-                        showMessage('Login successful! Redirecting...');
-                        // TODO: Redirect to main page (next step)
-                    } else {
-                        showMessage(result.message, true);
-                    }
-                })
-                .withFailureHandler(error => {
-                    showMessage('Error: Could not connect to server', true);
-                })
-                .validateUser(username, password);
+            try {
+                const response = await fetch(BASE_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'validateUser',
+                        payload: { username, password }
+                    })
+                });
+                const result = await response.json();
+                if (result.success) {
+                    localStorage.setItem('sessionId', result.sessionId);
+                    localStorage.setItem('role', result.role);
+                    showMessage('Login successful! Redirecting...');
+                    setTimeout(() => {
+                        window.location.href = 'main.html';
+                    }, 1000);
+                } else {
+                    showMessage(result.message, true);
+                }
+            } catch (error) {
+                showMessage('Error: Could not connect to server', true);
+            }
         }
     </script>
 </head>
