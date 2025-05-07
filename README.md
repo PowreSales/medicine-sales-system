@@ -1,1 +1,1 @@
-# medicine-sales-system
+# medicine-sales-frontend
