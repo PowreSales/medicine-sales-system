@@ -16,6 +16,7 @@
         }
 
         async function fetchInventory() {
+            showMessage('Loading inventory...');
             try {
                 const response = await fetch(BASE_URL, {
                     method: 'POST',
@@ -29,11 +30,12 @@
                 const result = await response.json();
                 if (result.success) {
                     displayInventory(result.data);
+                    showMessage(result.message || 'Inventory loaded');
                 } else {
                     showMessage(result.message, true);
                 }
             } catch (error) {
-                showMessage(`Error: ${error.message}`, true);
+                showMessage(`Error fetching inventory: ${error.message}`, true);
                 console.error('Fetch inventory error:', error);
             }
         }
@@ -41,6 +43,12 @@
         function displayInventory(data) {
             const tableBody = document.getElementById('inventoryTableBody');
             tableBody.innerHTML = '';
+            if (data.length === 0) {
+                const row = document.createElement('tr');
+                row.innerHTML = '<td colspan="4" class="border px-4 py-2 text-center">No inventory data</td>';
+                tableBody.appendChild(row);
+                return;
+            }
             data.forEach(item => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
@@ -85,7 +93,7 @@
                     fetchInventory();
                 }
             } catch (error) {
-                showMessage(`Error: ${error.message}`, true);
+                showMessage(`Error adding medicine: ${error.message}`, true);
                 console.error('Add medicine error:', error);
             }
         }
@@ -109,7 +117,7 @@
                     showMessage(result.message, true);
                 }
             } catch (error) {
-                showMessage(`Error: ${error.message}`, true);
+                showMessage(`Error fetching sales: ${error.message}`, true);
                 console.error('Sales report error:', error);
             }
         }
@@ -133,7 +141,7 @@
                     showMessage(result.message, true);
                 }
             } catch (error) {
-                showMessage(`Error: ${error.message}`, true);
+                showMessage(`Error fetching worth: ${error.message}`, true);
                 console.error('Shop worth error:', error);
             }
         }
@@ -147,7 +155,7 @@
                 <button onclick="document.getElementById('home').scrollIntoView()" class="px-3 py-1 rounded hover:bg-blue-700">Home</button>
                 <button onclick="document.getElementById('inventory').scrollIntoView()" class="px-3 py-1 rounded hover:bg-blue-700">Inventory</button>
                 <button onclick="document.getElementById('sales').scrollIntoView()" class="px-3 py-1 rounded hover:bg-blue-700">Sales</button>
-                <button onclick="document.getElementById('reports').scrollIntoView()" class="px-3 py-1Dot hover:bg-blue-700">Reports</button>
+                <button onclick="document.getElementById('reports').scrollIntoView()" class="px-3 py-1 rounded hover:bg-blue-700">Reports</button>
             </div>
         </div>
     </nav>
