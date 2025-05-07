@@ -6,7 +6,7 @@
     <title>Medicine Sales System</title>
     <link rel="stylesheet" href="styles.css">
     <script>
-        const BASE_URL = 'https://script.google.com/macros/s/AKfycbwMumxYrEusSLGYqzatfdzlqlUZf5ZVSA7OhmO217-4KZDXwBtI6CvqT_SpoRv-u4fLgg/exec'; // Replace with your Google Apps Script web app URL
+        const BASE_URL = 'https://script.google.com/macros/s/AKfycbwMumxYrEusSLGYqzatfdzlqlUZf5ZVSA7OhmO217-4KZDXwBtI6CvqT_SpoRv-u4fLgg/execL'; // Replace with your Google Apps Script web app URL
         const TEMP_SESSION_ID = 'test-session'; // Temporary for testing
 
         function showMessage(message, isError = false) {
@@ -18,14 +18,7 @@
         async function fetchInventory() {
             showMessage('Loading inventory...');
             try {
-                const response = await fetch(BASE_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        action: 'getInventoryData',
-                        payload: { sessionId: TEMP_SESSION_ID }
-                    })
-                });
+                const response = await fetch(`${BASE_URL}?action=getInventoryData&sessionId=${TEMP_SESSION_ID}`);
                 if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
                 const result = await response.json();
                 if (result.success) {
@@ -101,14 +94,7 @@
         async function showTodaysSales() {
             const today = new Date().toISOString().split('T')[0];
             try {
-                const response = await fetch(BASE_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        action: 'getSalesReport',
-                        payload: { sessionId: TEMP_SESSION_ID, startDate: today, endDate: today }
-                    })
-                });
+                const response = await fetch(`${BASE_URL}?action=getSalesReport&sessionId=${TEMP_SESSION_ID}&startDate=${today}&endDate=${today}`);
                 if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
                 const result = await response.json();
                 if (result.success) {
@@ -124,14 +110,7 @@
 
         async function showShopWorth() {
             try {
-                const response = await fetch(BASE_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        action: 'getInventoryData',
-                        payload: { sessionId: TEMP_SESSION_ID }
-                    })
-                });
+                const response = await fetch(`${BASE_URL}?action=getInventoryData&sessionId=${TEMP_SESSION_ID}`);
                 if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
                 const result = await response.json();
                 if (result.success) {
