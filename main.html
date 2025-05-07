@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medicine Sales System - Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        function checkSession() {
+            const sessionId = localStorage.getItem('sessionId');
+            const role = localStorage.getItem('role');
+            if (!sessionId || !role) {
+                window.location.href = 'index.html';
+            }
+            document.getElementById('welcome').textContent = `Welcome, ${role}!`;
+        }
+
+        function logout() {
+            localStorage.removeItem('sessionId');
+            localStorage.removeItem('role');
+            window.location.href = 'index.html';
+        }
+    </script>
+</head>
+<body class="bg-gray-100 min-h-screen" onload="checkSession()">
+    <div class="bg-white p-6 shadow-lg w-full max-w-md mx-auto mt-4 rounded-lg">
+        <h1 class="text-2xl font-bold text-center text-blue-600 mb-4">Medicine Sales Dashboard</h1>
+        <p id="welcome" class="text-center text-lg mb-4"></p>
+        <button onclick="logout()" class="w-full bg-red-600 text-white p-2 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500">Logout</button>
+    </div>
+</body>
+</html>
